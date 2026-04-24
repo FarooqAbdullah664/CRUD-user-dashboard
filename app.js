@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -7,7 +9,6 @@ app.set('view engine', 'ejs');
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, 'public')));
-require('dotenv').config();
 
 // Home page - Create User
 app.get('/', (req, res) => {
@@ -23,12 +24,19 @@ app.get('/read', async (req, res) => {
 // Create User
 app.post('/create', async (req, res) => {
     let { name, email, imageurl } = req.body;
-    await userModel.create({
-        name,
-        email,
-        image: imageurl
-    });
-    res.redirect('/read');
+    try {
+        await userModel.create({
+            name,
+            email,
+            image: imageurl
+        });
+        res.redirect('/read');
+    } catch (err) {
+        if (err.code === 11000) {
+            return res.send("❌ Yeh email already exist karti hai. Doosri email use karo.");
+        }
+        res.send("❌ Kuch error aa gaya: " + err.message);
+    }
 });
 
 // Delete User
