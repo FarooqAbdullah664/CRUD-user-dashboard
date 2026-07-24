@@ -63,6 +63,11 @@ app.post('/edit/:id', async (req, res) => {
     res.redirect('/read');
 });
 
-app.listen(3000, () => {
-    console.log("Server running on port 3000");
-});
+// Local development
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(3000, () => {
+        console.log("Server running on port 3000");
+    });
+}
+
+module.exports = app;
